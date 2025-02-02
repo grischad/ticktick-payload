@@ -16,6 +16,7 @@ export interface Config {
     media: Media;
     categories: Category;
     users: User;
+    tasks: Task;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -32,6 +33,7 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
+    tasks: TasksSelect<false> | TasksSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -58,6 +60,7 @@ export interface Config {
   };
   jobs: {
     tasks: {
+      sync: TaskSync;
       schedulePublish: TaskSchedulePublish;
       inline: {
         input: unknown;
@@ -672,6 +675,32 @@ export interface Form {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tasks".
+ */
+export interface Task {
+  id: string;
+  ticktickId: string;
+  title: string;
+  content?: string | null;
+  status?: ('0' | '1' | '2') | null;
+  priority?: ('0' | '1' | '3' | '5') | null;
+  impact: number;
+  confidence: number;
+  ease: number;
+  dueDate?: string | null;
+  startDate?: string | null;
+  tags?:
+    | {
+        name?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  lastSync?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -795,7 +824,7 @@ export interface PayloadJob {
     | {
         executedAt: string;
         completedAt: string;
-        taskSlug: 'inline' | 'schedulePublish';
+        taskSlug: 'inline' | 'sync' | 'schedulePublish';
         taskID: string;
         input?:
           | {
@@ -828,7 +857,7 @@ export interface PayloadJob {
         id?: string | null;
       }[]
     | null;
-  taskSlug?: ('inline' | 'schedulePublish') | null;
+  taskSlug?: ('inline' | 'sync' | 'schedulePublish') | null;
   queue?: string | null;
   waitUntil?: string | null;
   processing?: boolean | null;
@@ -861,6 +890,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'users';
         value: string | User;
+      } | null)
+    | ({
+        relationTo: 'tasks';
+        value: string | Task;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -1221,6 +1254,31 @@ export interface UsersSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tasks_select".
+ */
+export interface TasksSelect<T extends boolean = true> {
+  ticktickId?: T;
+  title?: T;
+  content?: T;
+  status?: T;
+  priority?: T;
+  impact?: T;
+  confidence?: T;
+  ease?: T;
+  dueDate?: T;
+  startDate?: T;
+  tags?:
+    | T
+    | {
+        name?: T;
+        id?: T;
+      };
+  lastSync?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects_select".
  */
 export interface RedirectsSelect<T extends boolean = true> {
@@ -1575,6 +1633,14 @@ export interface FooterSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskSync".
+ */
+export interface TaskSync {
+  input?: unknown;
+  output?: unknown;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
